@@ -19,7 +19,7 @@ namespace GeofencingLab.Droid.Receiver
 	public class GeofencingBroadcastReceiver : BroadcastReceiver
 	{
 		private string TAG = "GeofencingBroadcastReceiver";
-		public static String ACTION_PROCESS_UPDATES = "GeofenceBroadcastReceiver.PROCESS_UPDATES";
+		//public static String ACTION_PROCESS_UPDATES = "GeofenceBroadcastReceiver.PROCESS_UPDATES";
 
 		public override void OnReceive(Context context, Intent intent)
 		{
@@ -61,7 +61,7 @@ namespace GeofencingLab.Droid.Receiver
 				var areaName = GeofenceTransitionDetails(triggeringGeofences);
 				var transitionType = GetTransitionString(geofenceTransition);
 				Toast.MakeText(context, transitionType, ToastLength.Long).Show();
-				NotificationHelper.PushHightNotification(context, areaName, transitionType);
+				NotificationHelper.PushHightNotification(context, transitionType, areaName);
 			}
 			catch (Exception ex)
 			{

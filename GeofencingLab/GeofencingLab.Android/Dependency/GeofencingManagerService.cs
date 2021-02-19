@@ -47,6 +47,8 @@ namespace GeofencingLab.Droid.Dependency
 			{
 				if (MainActivity.Instance.EnableBackGround())
 				{
+					// GoogleApiClient is obsolete choose use this or fusedLocationProviderClient if use fusedLocationProviderClient please uncommend Related
+					#region GoogleApiClient
 					var queryResult = GoogleApiAvailability.Instance.IsGooglePlayServicesAvailable(context);
 					if (queryResult == ConnectionResult.Success)
 					{
@@ -56,22 +58,37 @@ namespace GeofencingLab.Droid.Dependency
 							.AddOnConnectionFailedListener(this)
 							.Build();
 
-						googleApiClient.Connect();
-					}
+						if (!googleApiClient.IsConnected)
+						{
+							googleApiClient.Connect();
+						}
 
-					//var isCheckAdded = await SecureStorage.GetAsync(Constants.GEOFENCE_SECURE_STORAGE_KEY);
-					//if (string.IsNullOrEmpty(isCheckAdded) || isCheckAdded != "IsAdded")
-					//{
-						geofenceHelper = new GeofenceHelper(context);
-						geofencingClient = LocationServices.GetGeofencingClient(context);
-						AddGeofence();
-					//}
+					}
 
 					if (GoogleApiAvailability.Instance.IsUserResolvableError(queryResult))
 					{
 						var errorString = GoogleApiAvailability.Instance.GetErrorString(queryResult);
 						Toast.MakeText(context, $"There is a problem with Google Play Services on this device: {queryResult} - {errorString}", ToastLength.Long).Show();
 					}
+					#endregion
+
+					#region fusedLocationProviderClient
+					//bool isGooglePlayServicesInstalled = IsGooglePlayServicesInstalled();
+					//if (isGooglePlayServicesInstalled)
+					//{
+					//	SubscriptToLocationUpdate();
+					//}
+					#endregion
+
+					var isCheckAdded = await SecureStorage.GetAsync(Constants.GEOFENCE_SECURE_STORAGE_KEY);
+					if (geofencingClient is null || string.IsNullOrEmpty(isCheckAdded) || isCheckAdded != "IsAdded")
+					{
+						geofenceHelper = new GeofenceHelper(context);
+						geofencingClient = LocationServices.GetGeofencingClient(context);
+						AddGeofence();
+					}
+
+
 				}
 				else
 				{
@@ -97,6 +114,45 @@ namespace GeofencingLab.Droid.Dependency
 				.AddOnFailureListener(geofenceListener);
 		}
 
+		private PendingIntent GetPendingIntentLocationBroadcastReceiver()
+		{
+			Intent intent = new Intent(context, typeof(LocationBroadcastReceiver));
+			//intent.SetAction(LocationBroadcastReceiver.ACTION_PROCESS_UPDATES);
+			return PendingIntent.GetBroadcast(context, 0, intent, PendingIntentFlags.UpdateCurrent);
+		}
+
+		private bool IsGooglePlayServicesInstalled()
+		{
+			var queryResult = GoogleApiAvailability.Instance.IsGooglePlayServicesAvailable(context);
+			if (queryResult == ConnectionResult.Success)
+			{
+				return true;
+			}
+
+			if (GoogleApiAvailability.Instance.IsUserResolvableError(queryResult))
+			{
+				var errorString = GoogleApiAvailability.Instance.GetErrorString(queryResult);
+				Toast.MakeText(context, $"There is a problem with Google Play Services on this device: {queryResult} - {errorString}", ToastLength.Long).Show();
+			}
+
+			return false;
+		}
+
+		private async void SubscriptToLocationUpdate()
+		{
+			NotificationHelper.PushHightNotification(context, "GoogleApiClient.Builder", "Conection");
+			var fusedLocationProviderClient = LocationServices.GetFusedLocationProviderClient(context);
+
+			// Call Location Services
+			var locationRequest = LocationRequest.Create()
+				.SetInterval(2000) // 1000*30 อ่านพิกัดทุก 1 นาที
+				.SetFastestInterval(1000) // 1000 * 10 เครื่องจับได้ก่อนอ่านทุก 10 วิ
+				.SetPriority(LocationRequest.PriorityHighAccuracy);
+
+			await fusedLocationProviderClient.RequestLocationUpdatesAsync(locationRequest, GetPendingIntentLocationBroadcastReceiver());
+		}
+
+
 		public void OnConnectionFailed(ConnectionResult p0)
 		{
 			throw new NotImplementedException();
@@ -110,11 +166,11 @@ namespace GeofencingLab.Droid.Dependency
 			{
 				// Call Location Services
 				var locationRequest = LocationRequest.Create()
-					.SetInterval(2000)
-					.SetFastestInterval(30000)
+					.SetInterval(2000) // 1000*30 อ่านพิกัดทุก 1 นาที
+					.SetFastestInterval(1000) // 1000 * 10 เครื่องจับได้ก่อนอ่านทุก 10 วิ
 					.SetPriority(LocationRequest.PriorityHighAccuracy);
 
-				LocationServices.FusedLocationApi.RequestLocationUpdates(googleApiClient, locationRequest, GetPendingIntentLocationBroadcastReceiver());
+				LocationServices.FusedLocationApi.RequestLocationUpdatesAsync(googleApiClient, locationRequest, GetPendingIntentLocationBroadcastReceiver());
 				LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
 				builder.AddLocationRequest(locationRequest);
 
@@ -125,14 +181,12 @@ namespace GeofencingLab.Droid.Dependency
 			}
 		}
 
-		private PendingIntent GetPendingIntentLocationBroadcastReceiver()
-		{ 
-			Intent intent = new Intent(context, typeof(LocationBroadcastReceiver));
-			intent.SetAction(LocationBroadcastReceiver.ACTION_PROCESS_UPDATES);
-			return PendingIntent.GetBroadcast(context, 0, intent, PendingIntentFlags.UpdateCurrent);
+		public void OnConnectionSuspended(int p0)
+		{
+			throw new NotImplementedException();
 		}
 
-		public void OnConnectionSuspended(int p0)
+		public void OnLocationChanged(Android.Locations.Location location)
 		{
 			throw new NotImplementedException();
 		}
