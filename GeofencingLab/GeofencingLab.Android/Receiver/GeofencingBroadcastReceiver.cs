@@ -58,7 +58,7 @@ namespace GeofencingLab.Droid.Receiver
 
 				IList<IGeofence> triggeringGeofences = geofencingEvent.TriggeringGeofences;
 
-				var areaName = GeofenceTransitionDetails(triggeringGeofences);
+				var areaName = GetGeofenceTransitionDetails(triggeringGeofences);
 				var transitionType = GetTransitionString(geofenceTransition);
 				Toast.MakeText(context, transitionType, ToastLength.Long).Show();
 				NotificationHelper.PushHightNotification(context, transitionType, areaName);
@@ -69,7 +69,7 @@ namespace GeofencingLab.Droid.Receiver
 			}
 		}
 
-		private string GeofenceTransitionDetails(IList<IGeofence> triggeringGeofences)
+		private string GetGeofenceTransitionDetails(IList<IGeofence> triggeringGeofences)
 		{
 			//string geofenceTransitionString = GetTransitionString(geofenceTransition);
 

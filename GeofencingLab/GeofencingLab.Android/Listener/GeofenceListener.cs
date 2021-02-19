@@ -29,8 +29,6 @@ namespace GeofencingLab.Droid.Listener
 			//Log.Info("GeofenceListener_TAG", "OnSuccess: Geofence Added...");
 			Toast.MakeText(MainActivity.Instance, "OnSuccess: Geofence Added...", ToastLength.Long).Show();
 			NotificationHelper.PushHightNotification(Android.App.Application.Context, "OnSuccess", "Geofence Added...");
-
-			SecureStorage.SetAsync(Constants.GEOFENCE_SECURE_STORAGE_KEY, "IsAdded");
 		}
 
 		public void OnFailure(Java.Lang.Exception e)
@@ -52,7 +50,6 @@ namespace GeofencingLab.Droid.Listener
 						Toast.MakeText(MainActivity.Instance, "GeofenceTooManyPendingIntents", ToastLength.Long).Show();
 						break;
 				}
-				SecureStorage.Remove(Constants.GEOFENCE_SECURE_STORAGE_KEY);
 			}
 
 		}

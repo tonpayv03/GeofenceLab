@@ -15,7 +15,6 @@ using Android;
 using AndroidX.Core.App;
 using GeofencingLab.Dependency;
 using Xamarin.Forms;
-using Plugin.CurrentActivity;
 
 namespace GeofencingLab.Droid
 {
@@ -41,7 +40,7 @@ namespace GeofencingLab.Droid
 			RegisterReceiver(myReceiverTest, new IntentFilter(Android.Content.Intent.ActionBatteryLow));
 
 			Xamarin.Essentials.Platform.Init(this, savedInstanceState);
-			CrossCurrentActivity.Current.Init(this, savedInstanceState);
+			//CrossCurrentActivity.Current.Init(this, savedInstanceState);
 			global::Xamarin.Forms.Forms.Init(this, savedInstanceState);
 
 			InitNotificationChannel();

@@ -1,9 +1,10 @@
 ﻿using Android.App;
 using Android.Content;
 using Android.OS;
+using AndroidX.Core.App;
 using System;
-using Android.Support.V4.App;
-using static Android.Support.V4.App.NotificationCompat;
+//using Android.Support.V4.App;
+//using static Android.Support.V4.App.NotificationCompat;
 using Xamarin.Essentials;
 
 namespace GeofencingLab.Droid.Helper
@@ -40,7 +41,8 @@ namespace GeofencingLab.Droid.Helper
 
 		public static void PushHightNotification(Context contextParam, string title,string message)
 		{
-			GetNotificationChanelID();
+			//contextParam = global::Android.App.Application.Context;
+			GetNotificationID();
 
 			var intent = new Intent(contextParam, typeof(MainActivity));
 			intent.AddFlags(ActivityFlags.SingleTop);
@@ -50,10 +52,10 @@ namespace GeofencingLab.Droid.Helper
 														 intent,
 														 PendingIntentFlags.UpdateCurrent);
 
-			var pendingIntent2 = PendingIntent.GetActivity(contextParam,
-														 100,
-														 intent,
-														 PendingIntentFlags.UpdateCurrent);
+			//var pendingIntent2 = PendingIntent.GetActivity(contextParam,
+			//											 100,
+			//											 intent,
+			//											 PendingIntentFlags.UpdateCurrent);
 
 			var notificationBuilder = new NotificationCompat.Builder(contextParam, Constants.HIGH_CHANNEL_ID)
 					.SetSmallIcon(Resource.Drawable.notification_bg)
@@ -107,7 +109,7 @@ namespace GeofencingLab.Droid.Helper
 		//	//StartForeground(11, notificationBuilder);
 		//}
 
-		private static async void GetNotificationChanelID()
+		private static async void GetNotificationID()
 		{
 			var notification__id = await SecureStorage.GetAsync("NOTIFY_ID");
 			try

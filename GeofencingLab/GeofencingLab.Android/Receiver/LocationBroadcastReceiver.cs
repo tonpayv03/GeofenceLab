@@ -14,7 +14,7 @@ using System.Text;
 
 namespace GeofencingLab.Droid.Receiver
 {
-	[BroadcastReceiver(Enabled = true, Exported = true, Name = Constants.LOCATION_BROADCAST_RECEIVER)]
+	[BroadcastReceiver(Enabled = true, Exported = false, Name = Constants.LOCATION_BROADCAST_RECEIVER)]
 	//[IntentFilter(new[] { "LocationBroadcastReceiver.PROCESS_UPDATES" })]
 	public class LocationBroadcastReceiver : BroadcastReceiver
 	{
@@ -35,8 +35,8 @@ namespace GeofencingLab.Droid.Receiver
 					return;
 				}
 				Location location = locations.FirstOrDefault();
-				NotificationHelper.PushHightNotification(context, TAG, $"Lat::{location.Latitude} / Lng::{location.Longitude}");
-
+				//NotificationHelper.PushHightNotification(context, TAG, $"Lat::{location.Latitude} / Lng::{location.Longitude}");
+				Toast.MakeText(context, $"Lat::{location.Latitude:.######} / Lng::{location.Longitude:.######}", ToastLength.Long).Show();
 			}
 		}
 	}

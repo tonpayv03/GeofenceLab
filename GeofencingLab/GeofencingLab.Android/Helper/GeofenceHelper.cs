@@ -17,7 +17,7 @@ namespace GeofencingLab.Droid.Helper
 	{
 		//private List<IGeofence> geofenceList = new List<IGeofence>();
 		private Context context;
-
+		private PendingIntent pendingIntent;
 		public GeofenceHelper(Context context) : base(context)
 		{
 			this.context = context;
@@ -26,7 +26,8 @@ namespace GeofencingLab.Droid.Helper
 		public GeofencingRequest GetGeofencingRequest(List<IGeofence> geofences)
 		{
 			GeofencingRequest.Builder builder = new GeofencingRequest.Builder();
-			builder.SetInitialTrigger(GeofencingRequest.InitialTriggerEnter | GeofencingRequest.InitialTriggerDwell | GeofencingRequest.InitialTriggerExit);  // set ให้เริ่มต้นการ Trigger ด้วย event enter เมื่ออยู่นอก area แล้วเข้ามาใน area , เริ่ม Trigger ด้วย event exit เมื่ออยู่ใน area แล้วออกนอก area
+			builder.SetInitialTrigger(GeofencingRequest.InitialTriggerDwell);
+			//builder.SetInitialTrigger(GeofencingRequest.InitialTriggerEnter | GeofencingRequest.InitialTriggerDwell | GeofencingRequest.InitialTriggerExit);  // set ให้เริ่มต้นการ Trigger ด้วย event enter เมื่ออยู่นอก area แล้วเข้ามาใน area , เริ่ม Trigger ด้วย event exit เมื่ออยู่ใน area แล้วออกนอก area
 			builder.AddGeofences(geofences);
 			return builder.Build();
 		}
@@ -40,7 +41,7 @@ namespace GeofencingLab.Droid.Helper
 					.SetRequestId(entry.Key)
 					.SetCircularRegion(entry.Value.lat, entry.Value.lng, Constants.GEOFENCE_RADIUS)
 					.SetTransitionTypes(Geofence.GeofenceTransitionEnter | Geofence.GeofenceTransitionDwell | Geofence.GeofenceTransitionExit)
-					.SetLoiteringDelay(3000) // 5 second
+					.SetLoiteringDelay(3000) // 3 second
 					.SetExpirationDuration(Geofence.NeverExpire)
 					.Build());
 			}
@@ -56,8 +57,11 @@ namespace GeofencingLab.Droid.Helper
 
 			Intent intent = new Intent(global::Android.App.Application.Context, typeof(GeofencingBroadcastReceiver));
 			//intent.SetAction(GeofencingBroadcastReceiver.ACTION_PROCESS_UPDATES);
+			//pendingIntent = PendingIntent.GetBroadcast(global::Android.App.Application.Context, 0, intent, PendingIntentFlags.UpdateCurrent);
+			//return pendingIntent;
 
 			return PendingIntent.GetBroadcast(global::Android.App.Application.Context, 0, intent, PendingIntentFlags.UpdateCurrent);
+
 		}
 	}
 }

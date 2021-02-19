@@ -5,7 +5,6 @@ using Android.Content.PM;
 using Android.Gms.Common;
 using Android.Gms.Common.Apis;
 using Android.Gms.Location;
-using Android.Gms.Tasks;
 using Android.OS;
 using Android.Runtime;
 using Android.Views;
@@ -49,46 +48,40 @@ namespace GeofencingLab.Droid.Dependency
 				{
 					// GoogleApiClient is obsolete choose use this or fusedLocationProviderClient if use fusedLocationProviderClient please uncommend Related
 					#region GoogleApiClient
-					var queryResult = GoogleApiAvailability.Instance.IsGooglePlayServicesAvailable(context);
-					if (queryResult == ConnectionResult.Success)
-					{
-						googleApiClient = new GoogleApiClient.Builder(context).
-							AddApi(LocationServices.API)
-							.AddConnectionCallbacks(this)
-							.AddOnConnectionFailedListener(this)
-							.Build();
-
-						if (!googleApiClient.IsConnected)
-						{
-							googleApiClient.Connect();
-						}
-
-					}
-
-					if (GoogleApiAvailability.Instance.IsUserResolvableError(queryResult))
-					{
-						var errorString = GoogleApiAvailability.Instance.GetErrorString(queryResult);
-						Toast.MakeText(context, $"There is a problem with Google Play Services on this device: {queryResult} - {errorString}", ToastLength.Long).Show();
-					}
-					#endregion
-
-					#region fusedLocationProviderClient
-					//bool isGooglePlayServicesInstalled = IsGooglePlayServicesInstalled();
-					//if (isGooglePlayServicesInstalled)
+					//var queryResult = GoogleApiAvailability.Instance.IsGooglePlayServicesAvailable(context);
+					//if (queryResult == ConnectionResult.Success)
 					//{
-					//	SubscriptToLocationUpdate();
+					//	googleApiClient = new GoogleApiClient.Builder(context).
+					//		AddApi(LocationServices.API)
+					//		.AddConnectionCallbacks(this)
+					//		.AddOnConnectionFailedListener(this)
+					//		.Build();
+
+					//	if (!googleApiClient.IsConnected)
+					//	{
+					//		googleApiClient.Connect();
+					//	}
+
+					//}
+
+					//if (GoogleApiAvailability.Instance.IsUserResolvableError(queryResult))
+					//{
+					//	var errorString = GoogleApiAvailability.Instance.GetErrorString(queryResult);
+					//	Toast.MakeText(context, $"There is a problem with Google Play Services on this device: {queryResult} - {errorString}", ToastLength.Long).Show();
 					//}
 					#endregion
 
-					var isCheckAdded = await SecureStorage.GetAsync(Constants.GEOFENCE_SECURE_STORAGE_KEY);
-					if (geofencingClient is null || string.IsNullOrEmpty(isCheckAdded) || isCheckAdded != "IsAdded")
+					#region fusedLocationProviderClient
+					bool isGooglePlayServicesInstalled = IsGooglePlayServicesInstalled();
+					if (isGooglePlayServicesInstalled)
 					{
-						geofenceHelper = new GeofenceHelper(context);
-						geofencingClient = LocationServices.GetGeofencingClient(context);
-						AddGeofence();
+						SubscriptToLocationUpdate();
 					}
+					#endregion
 
-
+					geofenceHelper = new GeofenceHelper(context);
+					geofencingClient = LocationServices.GetGeofencingClient(context);
+					AddGeofence();
 				}
 				else
 				{
@@ -145,8 +138,8 @@ namespace GeofencingLab.Droid.Dependency
 
 			// Call Location Services
 			var locationRequest = LocationRequest.Create()
-				.SetInterval(2000) // 1000*30 อ่านพิกัดทุก 1 นาที
-				.SetFastestInterval(1000) // 1000 * 10 เครื่องจับได้ก่อนอ่านทุก 10 วิ
+				.SetInterval(1000*60) // 1000*60 อ่านพิกัดทุก 1 นาที
+				.SetFastestInterval(1000*10) // 1000*30 เครื่องจับได้ก่อนอ่านทุก 10 วิ
 				.SetPriority(LocationRequest.PriorityHighAccuracy);
 
 			await fusedLocationProviderClient.RequestLocationUpdatesAsync(locationRequest, GetPendingIntentLocationBroadcastReceiver());
@@ -167,7 +160,7 @@ namespace GeofencingLab.Droid.Dependency
 				// Call Location Services
 				var locationRequest = LocationRequest.Create()
 					.SetInterval(2000) // 1000*30 อ่านพิกัดทุก 1 นาที
-					.SetFastestInterval(1000) // 1000 * 10 เครื่องจับได้ก่อนอ่านทุก 10 วิ
+					.SetFastestInterval(1000) // 1000 * 10 เครื่องจับได้ก่อนอ่านทุก 10 วิw
 					.SetPriority(LocationRequest.PriorityHighAccuracy);
 
 				LocationServices.FusedLocationApi.RequestLocationUpdatesAsync(googleApiClient, locationRequest, GetPendingIntentLocationBroadcastReceiver());
