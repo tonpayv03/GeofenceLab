@@ -35,13 +35,13 @@ namespace GeofencingLab.Droid.Helper
 		public List<IGeofence> GetGeofenceList()
 		{
 			List<IGeofence> geofenceList = new List<IGeofence>();
-			foreach (var entry in Constants.BAY_AREA_LANDMARKS)
+			foreach (var entry in Treasure.BAY_AREA_LANDMARKS)
 			{
 				geofenceList.Add(new GeofenceBuilder()
 					.SetRequestId(entry.Key)
-					.SetCircularRegion(entry.Value.lat, entry.Value.lng, Constants.GEOFENCE_RADIUS)
+					.SetCircularRegion(entry.Value.Latitude, entry.Value.Longitude, Treasure.GEOFENCE_RADIUS)
 					.SetTransitionTypes(Geofence.GeofenceTransitionEnter | Geofence.GeofenceTransitionDwell | Geofence.GeofenceTransitionExit)
-					.SetLoiteringDelay(3000) // 3 second
+					.SetLoiteringDelay(5000) // 5 second
 					.SetExpirationDuration(Geofence.NeverExpire)
 					.Build());
 			}

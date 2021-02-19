@@ -63,11 +63,11 @@ namespace GeofencingLab.Droid
 				if (ActivityCompat.ShouldShowRequestPermissionRationale(this, Manifest.Permission.AccessFineLocation))
 				{
 					//We need to show user a dialog for displaying why the permission is needed and then ask for the permission...
-					ActivityCompat.RequestPermissions(this, new String[] { Manifest.Permission.AccessFineLocation }, Constants.FINE_LOCATION_ACCESS_REQUEST_CODE);
+					ActivityCompat.RequestPermissions(this, new String[] { Manifest.Permission.AccessFineLocation }, Treasure.FINE_LOCATION_ACCESS_REQUEST_CODE);
 				}
 				else
 				{
-					ActivityCompat.RequestPermissions(this, new String[] { Manifest.Permission.AccessFineLocation }, Constants.FINE_LOCATION_ACCESS_REQUEST_CODE);
+					ActivityCompat.RequestPermissions(this, new String[] { Manifest.Permission.AccessFineLocation }, Treasure.FINE_LOCATION_ACCESS_REQUEST_CODE);
 				}
 			}
 			return isCheck;
@@ -88,11 +88,11 @@ namespace GeofencingLab.Droid
 					if (ActivityCompat.ShouldShowRequestPermissionRationale(this, Manifest.Permission.AccessBackgroundLocation))
 					{
 						//We show a dialog and ask for permission
-						ActivityCompat.RequestPermissions(this, new String[] { Manifest.Permission.AccessBackgroundLocation }, Constants.BACKGROUND_LOCATION_ACCESS_REQUEST_CODE);
+						ActivityCompat.RequestPermissions(this, new String[] { Manifest.Permission.AccessBackgroundLocation }, Treasure.BACKGROUND_LOCATION_ACCESS_REQUEST_CODE);
 					}
 					else
 					{
-						ActivityCompat.RequestPermissions(this, new String[] { Manifest.Permission.AccessBackgroundLocation }, Constants.BACKGROUND_LOCATION_ACCESS_REQUEST_CODE);
+						ActivityCompat.RequestPermissions(this, new String[] { Manifest.Permission.AccessBackgroundLocation }, Treasure.BACKGROUND_LOCATION_ACCESS_REQUEST_CODE);
 					}
 				}
 			}
@@ -110,7 +110,7 @@ namespace GeofencingLab.Droid
 
 			base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
 
-			if (requestCode == Constants.FINE_LOCATION_ACCESS_REQUEST_CODE)
+			if (requestCode == Treasure.FINE_LOCATION_ACCESS_REQUEST_CODE)
 			{
 				if (grantResults.Length > 0 && grantResults[0] == Permission.Granted)
 				{
@@ -141,7 +141,7 @@ namespace GeofencingLab.Droid
 				}
 			}
 
-			if (requestCode == Constants.BACKGROUND_LOCATION_ACCESS_REQUEST_CODE)
+			if (requestCode == Treasure.BACKGROUND_LOCATION_ACCESS_REQUEST_CODE)
 			{
 				if (grantResults.Length > 0 && grantResults[0] == Permission.Granted)
 				{
@@ -176,7 +176,7 @@ namespace GeofencingLab.Droid
 		{
 			if (Build.VERSION.SdkInt >= BuildVersionCodes.O)
 			{
-				var channel = new NotificationChannel(Constants.HIGH_CHANNEL_ID, "High Notifications", NotificationImportance.High)
+				var channel = new NotificationChannel(Treasure.HIGH_CHANNEL_ID, "High Notifications", NotificationImportance.High)
 				{
 					Description = "Chanel For Clock-In And Clock-Out Notification Please Enable",
 				};

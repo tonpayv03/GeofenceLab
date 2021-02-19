@@ -48,7 +48,7 @@ namespace GeofencingLab.Droid.Helper
 			intent.AddFlags(ActivityFlags.SingleTop);
 
 			var pendingIntent1 = PendingIntent.GetActivity(contextParam,
-														 Constants.NOTIFY_ID,
+														 Treasure.NOTIFY_ID,
 														 intent,
 														 PendingIntentFlags.UpdateCurrent);
 
@@ -57,8 +57,8 @@ namespace GeofencingLab.Droid.Helper
 			//											 intent,
 			//											 PendingIntentFlags.UpdateCurrent);
 
-			var notificationBuilder = new NotificationCompat.Builder(contextParam, Constants.HIGH_CHANNEL_ID)
-					.SetSmallIcon(Resource.Drawable.notification_bg)
+			var notificationBuilder = new NotificationCompat.Builder(contextParam, Treasure.HIGH_CHANNEL_ID)
+					.SetSmallIcon(Resource.Drawable.markeron_limeblue)
 					.SetContentTitle(title)
 					.SetContentText(message)
 					.SetGroup("Notification")
@@ -68,8 +68,8 @@ namespace GeofencingLab.Droid.Helper
 					.SetContentIntent(pendingIntent1)
 					.SetStyle(new NotificationCompat.BigTextStyle().BigText(message));
 
-			var GroupnotificationBuilder = new NotificationCompat.Builder(contextParam, Constants.HIGH_CHANNEL_ID)
-									.SetSmallIcon(Resource.Drawable.notification_bg)
+			var GroupnotificationBuilder = new NotificationCompat.Builder(contextParam, Treasure.HIGH_CHANNEL_ID)
+									.SetSmallIcon(Resource.Drawable.markeron_limeblue)
 									.SetContentTitle(title)
 									.SetContentText(message)
 									.SetGroup("Notification")
@@ -83,7 +83,7 @@ namespace GeofencingLab.Droid.Helper
 
 			var notificationManager = NotificationManagerCompat.From(contextParam);
 			notificationManager.Notify(100, GroupnotificationBuilder.Build());
-			notificationManager.Notify(Constants.NOTIFY_ID, notificationBuilder.Build());
+			notificationManager.Notify(Treasure.NOTIFY_ID, notificationBuilder.Build());
 		}
 
 		//public void PushHightNotificationForeGround()
@@ -117,8 +117,8 @@ namespace GeofencingLab.Droid.Helper
 				if (string.IsNullOrEmpty(notification__id))
 				{
 					//empty = ไม่เคยได้รับเลย set เป็น 1
-					Constants.NOTIFY_ID = 1;
-					await SecureStorage.SetAsync("NOTIFY_ID", Constants.NOTIFY_ID.ToString());
+					Treasure.NOTIFY_ID = 1;
+					await SecureStorage.SetAsync("NOTIFY_ID", Treasure.NOTIFY_ID.ToString());
 				}
 				else
 				{
@@ -132,8 +132,8 @@ namespace GeofencingLab.Droid.Helper
 					{
 						id++;
 					}
-					Constants.NOTIFY_ID = id;
-					await SecureStorage.SetAsync("NOTIFY_ID", Constants.NOTIFY_ID.ToString());
+					Treasure.NOTIFY_ID = id;
+					await SecureStorage.SetAsync("NOTIFY_ID", Treasure.NOTIFY_ID.ToString());
 				}
 			}
 			catch (Exception e)

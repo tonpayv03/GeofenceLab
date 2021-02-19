@@ -14,7 +14,7 @@ using System.Text;
 
 namespace GeofencingLab.Droid.Receiver
 {
-	[BroadcastReceiver(Enabled = true, Exported = false, Name = Constants.GEOFENCE_BROADCAST_RECEIVER)]
+	[BroadcastReceiver(Enabled = true, Exported = false, Name = Treasure.GEOFENCE_BROADCAST_RECEIVER)]
 	//[IntentFilter(new[] { "GeofencingBroadcastReceiver.PROCESS_UPDATES" })]
 	public class GeofencingBroadcastReceiver : BroadcastReceiver
 	{
@@ -65,7 +65,7 @@ namespace GeofencingLab.Droid.Receiver
 			}
 			catch (Exception ex)
 			{
-				NotificationHelper.PushHightNotification(context, "GeofencingBroadcastReceiver Error", ex.Message);
+				NotificationHelper.PushHightNotification(context, $"{TAG} Error", ex.Message);
 			}
 		}
 
