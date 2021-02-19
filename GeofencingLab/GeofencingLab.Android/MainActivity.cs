@@ -15,6 +15,7 @@ using Android;
 using AndroidX.Core.App;
 using GeofencingLab.Dependency;
 using Xamarin.Forms;
+using Plugin.CurrentActivity;
 
 namespace GeofencingLab.Droid
 {
@@ -22,10 +23,7 @@ namespace GeofencingLab.Droid
 	public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsAppCompatActivity
 	{
 		//private GeofencingClient geofencingClient;
-		internal NotificationHelper NotificationHelper { get; private set; }
 		internal static MainActivity Instance { get; private set; }
-		private static int FINE_LOCATION_ACCESS_REQUEST_CODE = 10001;
-		private static int BACKGROUND_LOCATION_ACCESS_REQUEST_CODE = 10002;
 
 		protected override void OnCreate(Bundle savedInstanceState)
 		{
@@ -36,16 +34,20 @@ namespace GeofencingLab.Droid
 
 			Instance = this;
 
-			GeofencingBroadcastReceiver geofencingBroadcastReceiver = new GeofencingBroadcastReceiver();
-			RegisterReceiver(geofencingBroadcastReceiver, new IntentFilter("com.companyname.geofencinglab.GeofencingBroadcastReceiver"));
+			//GeofencingBroadcastReceiver geofencingBroadcastReceiver = new GeofencingBroadcastReceiver();
+			//RegisterReceiver(geofencingBroadcastReceiver, new IntentFilter("GeofencingBroadcastReceiver"));
 
 			MyReceiverTest myReceiverTest = new MyReceiverTest();
 			RegisterReceiver(myReceiverTest, new IntentFilter(Android.Content.Intent.ActionBatteryLow));
 
-			NotificationHelper = new NotificationHelper();
-
 			Xamarin.Essentials.Platform.Init(this, savedInstanceState);
+			CrossCurrentActivity.Current.Init(this, savedInstanceState);
 			global::Xamarin.Forms.Forms.Init(this, savedInstanceState);
+
+			InitNotificationChannel();
+			//_ = new NotificationHelper();
+
+
 			LoadApplication(new App());
 		}
 
@@ -62,11 +64,11 @@ namespace GeofencingLab.Droid
 				if (ActivityCompat.ShouldShowRequestPermissionRationale(this, Manifest.Permission.AccessFineLocation))
 				{
 					//We need to show user a dialog for displaying why the permission is needed and then ask for the permission...
-					ActivityCompat.RequestPermissions(this, new String[] { Manifest.Permission.AccessFineLocation }, FINE_LOCATION_ACCESS_REQUEST_CODE);
+					ActivityCompat.RequestPermissions(this, new String[] { Manifest.Permission.AccessFineLocation }, Constants.FINE_LOCATION_ACCESS_REQUEST_CODE);
 				}
 				else
 				{
-					ActivityCompat.RequestPermissions(this, new String[] { Manifest.Permission.AccessFineLocation }, FINE_LOCATION_ACCESS_REQUEST_CODE);
+					ActivityCompat.RequestPermissions(this, new String[] { Manifest.Permission.AccessFineLocation }, Constants.FINE_LOCATION_ACCESS_REQUEST_CODE);
 				}
 			}
 			return isCheck;
@@ -87,11 +89,11 @@ namespace GeofencingLab.Droid
 					if (ActivityCompat.ShouldShowRequestPermissionRationale(this, Manifest.Permission.AccessBackgroundLocation))
 					{
 						//We show a dialog and ask for permission
-						ActivityCompat.RequestPermissions(this, new String[] { Manifest.Permission.AccessBackgroundLocation }, BACKGROUND_LOCATION_ACCESS_REQUEST_CODE);
+						ActivityCompat.RequestPermissions(this, new String[] { Manifest.Permission.AccessBackgroundLocation }, Constants.BACKGROUND_LOCATION_ACCESS_REQUEST_CODE);
 					}
 					else
 					{
-						ActivityCompat.RequestPermissions(this, new String[] { Manifest.Permission.AccessBackgroundLocation }, BACKGROUND_LOCATION_ACCESS_REQUEST_CODE);
+						ActivityCompat.RequestPermissions(this, new String[] { Manifest.Permission.AccessBackgroundLocation }, Constants.BACKGROUND_LOCATION_ACCESS_REQUEST_CODE);
 					}
 				}
 			}
@@ -109,41 +111,83 @@ namespace GeofencingLab.Droid
 
 			base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
 
-			if (requestCode == FINE_LOCATION_ACCESS_REQUEST_CODE)
+			if (requestCode == Constants.FINE_LOCATION_ACCESS_REQUEST_CODE)
 			{
 				if (grantResults.Length > 0 && grantResults[0] == Permission.Granted)
 				{
 					//We have the permission
 					DependencyService.Get<IGeofencingManagerService>().InitGeofence();
 					//Toast.MakeText(this, "Granted Fine Location You can add geofences...", ToastLength.Long).Show();
-					NotificationHelper.PushHightNotification("FINE_LOCATION_ACCESS_REQUEST_CODE", "Granted Fine Location You can add geofences...");
+					NotificationHelper.PushHightNotification(this,"FINE_LOCATION_ACCESS_REQUEST_CODE", "Granted Fine Location You can add geofences...");
 
 				}
 				else
 				{
 					//We do not have the permission..
 					//Toast.MakeText(this, "Find Location location access is neccessary for geofences to trigger...", ToastLength.Long).Show();
-					NotificationHelper.PushHightNotification("FINE_LOCATION_ACCESS_REQUEST_CODE", "Find Location location access is neccessary for geofences to trigger...");
+					NotificationHelper.PushHightNotification(this, "FINE_LOCATION_ACCESS_REQUEST_CODE", "Find Location location access is neccessary for geofences to trigger...");
 
+					AlertDialog alertDialog = new AlertDialog.Builder(this)
+						.SetTitle("Permission Location Allow Always")
+						.SetMessage("This allows us to use your location to verify Clock-in, Clock-out location and location during working hours.")
+						.SetPositiveButton("Go To AppSettings", (senderAlert, args) =>
+						{
+
+							Intent intent = new Intent(Android.Provider.Settings.ActionApplicationDetailsSettings);
+							intent.SetData(Android.Net.Uri.Parse("package:" + this.ApplicationContext.PackageName));
+
+							this.StartActivity(intent);
+
+						}).Show();
 				}
 			}
 
-			if (requestCode == BACKGROUND_LOCATION_ACCESS_REQUEST_CODE)
+			if (requestCode == Constants.BACKGROUND_LOCATION_ACCESS_REQUEST_CODE)
 			{
 				if (grantResults.Length > 0 && grantResults[0] == Permission.Granted)
 				{
 					//We have the permission
 					DependencyService.Get<IGeofencingManagerService>().InitGeofence();
 					//Toast.MakeText(this, "Granted Background Location You can add geofences...", ToastLength.Long).Show();
-					NotificationHelper.PushHightNotification("BACKGROUND_LOCATION_ACCESS_REQUEST_CODE", "Granted Background Location You can add geofences...");
+					NotificationHelper.PushHightNotification(this, "BACKGROUND_LOCATION_ACCESS_REQUEST_CODE", "Granted Background Location You can add geofences...");
 				}
 				else
 				{
 					//We do not have the permission..
 					//Toast.MakeText(this, "Background location access is neccessary for geofences to trigger...", ToastLength.Long).Show();
-					NotificationHelper.PushHightNotification("BACKGROUND_LOCATION_ACCESS_REQUEST_CODE", "Background location access is neccessary for geofences to trigger...");
+					NotificationHelper.PushHightNotification(this, "BACKGROUND_LOCATION_ACCESS_REQUEST_CODE", "Background location access is neccessary for geofences to trigger...");
 
+					AlertDialog alertDialog = new AlertDialog.Builder(this)
+					.SetTitle("Permission Location Allow Always")
+					.SetMessage("This allows us to use your location to verify Clock-in, Clock-out location and location during working hours.")
+					.SetPositiveButton("Go To AppSettings", (senderAlert, args) =>
+					{
+
+						Intent intent = new Intent(Android.Provider.Settings.ActionApplicationDetailsSettings);
+						intent.SetData(Android.Net.Uri.Parse("package:" + this.ApplicationContext.PackageName));
+
+						this.StartActivity(intent);
+
+					}).Show();
 				}
+			}
+		}
+
+		private void InitNotificationChannel()
+		{
+			if (Build.VERSION.SdkInt >= BuildVersionCodes.O)
+			{
+				var channel = new NotificationChannel(Constants.HIGH_CHANNEL_ID, "High Notifications", NotificationImportance.High)
+				{
+					Description = "Chanel For Clock-In And Clock-Out Notification Please Enable",
+				};
+
+				channel.SetBypassDnd(true); // สามารถแสดงได้อยู่ถึงแม้ว่าจะอยู่ในโหมด Do Not Disturb
+											//channel.SetAllowBubbles(true); // แสดง Bubbles 
+				channel.LockscreenVisibility = NotificationVisibility.Public; // แสดงข้อมูลทั้งหมดตามปกติ ตอนล็อกหน้าจอ
+
+				var notificationManager = (NotificationManager)GetSystemService(Android.Content.Context.NotificationService);
+				notificationManager.CreateNotificationChannel(channel);
 			}
 		}
 	}

@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Xamarin.Essentials;
 
 namespace GeofencingLab.Droid.Listener
 {
@@ -25,9 +26,11 @@ namespace GeofencingLab.Droid.Listener
 
 		public void OnSuccess(Java.Lang.Object result)
 		{
-			Log.Info("GeofenceListener_TAG", "OnSuccess: Geofence Added...");
+			//Log.Info("GeofenceListener_TAG", "OnSuccess: Geofence Added...");
 			Toast.MakeText(MainActivity.Instance, "OnSuccess: Geofence Added...", ToastLength.Long).Show();
-			MainActivity.Instance.NotificationHelper.PushHightNotification("OnSuccess", "Geofence Added...");
+			NotificationHelper.PushHightNotification(Android.App.Application.Context, "OnSuccess", "Geofence Added...");
+
+			SecureStorage.SetAsync(Constants.GEOFENCE_SECURE_STORAGE_KEY, "IsAdded");
 		}
 
 		public void OnFailure(Java.Lang.Exception e)
@@ -49,6 +52,7 @@ namespace GeofencingLab.Droid.Listener
 						Toast.MakeText(MainActivity.Instance, "GeofenceTooManyPendingIntents", ToastLength.Long).Show();
 						break;
 				}
+				SecureStorage.Remove(Constants.GEOFENCE_SECURE_STORAGE_KEY);
 			}
 
 		}

@@ -14,66 +14,77 @@ using System.Text;
 
 namespace GeofencingLab.Droid.Receiver
 {
-	[BroadcastReceiver(Enabled = true, Exported = true)]
-	[IntentFilter(new[] { "com.companyname.geofencinglab.GeofencingBroadcastReceiver" })]
+	[BroadcastReceiver(Enabled = true, Exported = false, Name = Constants.GEOFENCE_BROADCAST_RECEIVER)]
+	//[IntentFilter(new[] { "GeofencingBroadcastReceiver.PROCESS_UPDATES" })]
 	public class GeofencingBroadcastReceiver : BroadcastReceiver
 	{
 		private string TAG = "GeofencingBroadcastReceiver";
+		public static String ACTION_PROCESS_UPDATES = "GeofenceBroadcastReceiver.PROCESS_UPDATES";
+
 		public override void OnReceive(Context context, Intent intent)
 		{
 			try
 			{
-				//Toast.MakeText(context, "OnReceive", ToastLength.Long).Show();
-				MainActivity.Instance.NotificationHelper.PushHightNotification(TAG, "OnReceive");
+				Toast.MakeText(context, "OnReceive", ToastLength.Long).Show();
+				//NotificationHelper.PushHightNotification(TAG, "OnReceive");
 
 				GeofencingEvent geofencingEvent = GeofencingEvent.FromIntent(intent);
 
 				if (geofencingEvent.HasError)
 				{
-					MainActivity.Instance.NotificationHelper.PushHightNotification(TAG, "Error receiving geofence event");
+					NotificationHelper.PushHightNotification(context, TAG, "Error receiving geofence event");
 
 					return;
 				}
 
 				int geofenceTransition = geofencingEvent.GeofenceTransition;
-				//MainActivity.Instance.NotificationHelper.PushHightNotification(TAG, geofenceTransition.ToString());
-
 				switch (geofenceTransition)
 				{
 					case Geofence.GeofenceTransitionEnter:
-						Toast.MakeText(context, "GeofenceTransitionEnter", ToastLength.Long).Show();
-						MainActivity.Instance.NotificationHelper.PushHightNotification(TAG, "Enter");
+						//Toast.MakeText(context, "Enter", ToastLength.Long).Show();
+						//transitionString = "Enter";
 						break;
 					case Geofence.GeofenceTransitionExit:
-						Toast.MakeText(context, "GeofenceTransitionExit", ToastLength.Long).Show();
-						MainActivity.Instance.NotificationHelper.PushHightNotification(TAG, "Exit");
+						//Toast.MakeText(context, "GeofenceTransitionExit", ToastLength.Long).Show();
+						//transitionString = "Exit";
 						break;
 					case Geofence.GeofenceTransitionDwell:
-						Toast.MakeText(context, "GeofenceTransitionDwell", ToastLength.Long).Show();
-						MainActivity.Instance.NotificationHelper.PushHightNotification(TAG, "Dwell");
+						//Toast.MakeText(context, "GeofenceTransitionDwell", ToastLength.Long).Show();
+						//transitionString = "Dwell";
 						break;
 					default:
 						break;
 				}
 
 				IList<IGeofence> triggeringGeofences = geofencingEvent.TriggeringGeofences;
-				GeofenceTransitionDetails(geofenceTransition, triggeringGeofences);
+
+				var areaName = GeofenceTransitionDetails(triggeringGeofences);
+				var transitionType = GetTransitionString(geofenceTransition);
+				Toast.MakeText(context, transitionType, ToastLength.Long).Show();
+				NotificationHelper.PushHightNotification(context, areaName, transitionType);
 			}
 			catch (Exception ex)
 			{
-
+				NotificationHelper.PushHightNotification(context, "GeofencingBroadcastReceiver Error", ex.Message);
 			}
 		}
 
-		private void GeofenceTransitionDetails(int geofenceTransition, IList<IGeofence> triggeringGeofences)
+		private string GeofenceTransitionDetails(IList<IGeofence> triggeringGeofences)
 		{
-			string geofenceTransitionString = GetTransitionString(geofenceTransition);
+			//string geofenceTransitionString = GetTransitionString(geofenceTransition);
+
+			// Get the Ids of each geofence that was triggered.
+			List<String> triggeringGeofencesRequestIds = new List<String>();
 
 			foreach (IGeofence geofence in triggeringGeofences)
 			{
-				//MainActivity.Instance.NotificationHelper.PushHightNotification(TAG, $"{geofenceTransitionString}:{geofence.RequestId}");
-				Log.Debug(TAG, $"{geofenceTransitionString}:{geofence.RequestId}");
+				triggeringGeofencesRequestIds.Add(geofence.RequestId);
 			}
+
+			String triggeringGeofencesRequestIdsString = string.Join(", ", triggeringGeofencesRequestIds);
+
+			return $"{triggeringGeofencesRequestIdsString}";
+
 		}
 
 		private string GetTransitionString(int transitionType)

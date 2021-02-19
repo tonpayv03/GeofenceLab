@@ -15,52 +15,49 @@ namespace GeofencingLab.Droid.Helper
 {
 	public class GeofenceHelper : ContextWrapper
 	{
-		private PendingIntent pendingIntent;
-		private List<IGeofence> geofenceList = new List<IGeofence>();
-		private int REQUEST_CODE = 0;
+		//private List<IGeofence> geofenceList = new List<IGeofence>();
+		private Context context;
 
 		public GeofenceHelper(Context context) : base(context)
 		{
-
+			this.context = context;
 		}
 
 		public GeofencingRequest GetGeofencingRequest(List<IGeofence> geofences)
 		{
-			return new GeofencingRequest.Builder()
-				.SetInitialTrigger(
-					GeofencingRequest.InitialTriggerEnter | 
-					GeofencingRequest.InitialTriggerExit) // set ให้เริ่มต้นการ Trigger ด้วย event enter เมื่ออยู่นอก area แล้วเข้ามาใน area , เริ่ม Trigger ด้วย event exit เมื่ออยู่ใน area แล้วออกนอก area
-				.AddGeofences(geofences)
-				.Build();
+			GeofencingRequest.Builder builder = new GeofencingRequest.Builder();
+			builder.SetInitialTrigger(GeofencingRequest.InitialTriggerEnter | GeofencingRequest.InitialTriggerDwell | GeofencingRequest.InitialTriggerExit);  // set ให้เริ่มต้นการ Trigger ด้วย event enter เมื่ออยู่นอก area แล้วเข้ามาใน area , เริ่ม Trigger ด้วย event exit เมื่ออยู่ใน area แล้วออกนอก area
+			builder.AddGeofences(geofences);
+			return builder.Build();
 		}
 
-		public List<IGeofence> GetGeofenceList(string id, double lat, double lng, float radius)
+		public List<IGeofence> GetGeofenceList()
 		{
-			//MainActivity.Instance.NotificationHelper.PushHightNotification("GetGeofence", $"lat::{lat} / lng::{lng}");
-
-			geofenceList.Add(new GeofenceBuilder()
-				.SetRequestId(id)
-				.SetCircularRegion(lat, lng, radius)
-				.SetTransitionTypes(Geofence.GeofenceTransitionEnter | Geofence.GeofenceTransitionDwell | Geofence.GeofenceTransitionExit)
-				.SetLoiteringDelay(3000) // 5 second
-				.SetExpirationDuration(Geofence.NeverExpire)
-				.Build());
-
+			List<IGeofence> geofenceList = new List<IGeofence>();
+			foreach (var entry in Constants.BAY_AREA_LANDMARKS)
+			{
+				geofenceList.Add(new GeofenceBuilder()
+					.SetRequestId(entry.Key)
+					.SetCircularRegion(entry.Value.lat, entry.Value.lng, Constants.GEOFENCE_RADIUS)
+					.SetTransitionTypes(Geofence.GeofenceTransitionEnter | Geofence.GeofenceTransitionDwell | Geofence.GeofenceTransitionExit)
+					.SetLoiteringDelay(3000) // 5 second
+					.SetExpirationDuration(Geofence.NeverExpire)
+					.Build());
+			}
 			return geofenceList;
 		}
 
 		public PendingIntent GetPendingIntent()
 		{
-			if (pendingIntent != null)
-			{
-				return pendingIntent;
-			}
+			//if (pendingIntent != null)
+			//{
+			//	return pendingIntent;
+			//}
 
-			Intent intent = new Intent(this, Java.Lang.Class.FromType(typeof(GeofencingBroadcastReceiver)));
-			pendingIntent = PendingIntent.GetBroadcast(this, REQUEST_CODE, intent, PendingIntentFlags.UpdateCurrent);
+			Intent intent = new Intent(global::Android.App.Application.Context, typeof(GeofencingBroadcastReceiver));
+			//intent.SetAction(GeofencingBroadcastReceiver.ACTION_PROCESS_UPDATES);
 
-
-			return pendingIntent;
+			return PendingIntent.GetBroadcast(global::Android.App.Application.Context, 0, intent, PendingIntentFlags.UpdateCurrent);
 		}
 	}
 }

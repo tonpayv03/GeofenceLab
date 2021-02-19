@@ -1,97 +1,113 @@
 ﻿using Android.App;
 using Android.Content;
 using Android.OS;
-using Android.Runtime;
-using Android.Views;
-using Android.Widget;
-using AndroidX.Core.App;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using Android.Support.V4.App;
+using static Android.Support.V4.App.NotificationCompat;
 using Xamarin.Essentials;
-using static AndroidX.Core.App.NotificationCompat;
 
 namespace GeofencingLab.Droid.Helper
 {
-	public class NotificationHelper : Service
+	public class NotificationHelper
 	{
-		private Context mContext;
-		private int NOTIFY_ID = 0;
-		private string HIGH_CHANNEL_ID = "High_Notifications_Id";
-		private NotificationManager notificationManager;
+		//private static Context context;
 
-		public NotificationHelper()
-		{
-			mContext = global::Android.App.Application.Context;
-			InitNotificationChannel();
-		}
+		//public NotificationHelper()
+		//{
+		//	context = global::Android.App.Application.Context;
+		//	InitNotificationChannel();
+		//}
 
 
-		private void InitNotificationChannel()
-		{
-			if (Build.VERSION.SdkInt >= BuildVersionCodes.O)
-			{
-				var channel = new NotificationChannel(HIGH_CHANNEL_ID, "High Notifications", NotificationImportance.High)
-				{
-					Description = "Chanel For Clock-In And Clock-Out Notification Please Enable",
-				};
-				channel.SetBypassDnd(true); // สามารถแสดงได้อยู่ถึงแม้ว่าจะอยู่ในโหมด Do Not Disturb
-				//channel.SetAllowBubbles(true); // แสดง Bubbles 
-				channel.LockscreenVisibility = NotificationVisibility.Public; // แสดงข้อมูลทั้งหมดตามปกติ ตอนล็อกหน้าจอ
+		//private void InitNotificationChannel()
+		//{
+		//	if (Build.VERSION.SdkInt >= BuildVersionCodes.O)
+		//	{
+		//		var channel = new NotificationChannel(Constants.HIGH_CHANNEL_ID, "High Notifications", NotificationImportance.High)
+		//		{
+		//			Description = "Chanel For Clock-In And Clock-Out Notification Please Enable",
+		//		};
 
-				notificationManager = mContext.GetSystemService(Context.NotificationService) as NotificationManager;
-				notificationManager.CreateNotificationChannel(channel);
-			}
-		}
+		//		channel.SetBypassDnd(true); // สามารถแสดงได้อยู่ถึงแม้ว่าจะอยู่ในโหมด Do Not Disturb
+		//		//channel.SetAllowBubbles(true); // แสดง Bubbles 
+		//		channel.LockscreenVisibility = NotificationVisibility.Public; // แสดงข้อมูลทั้งหมดตามปกติ ตอนล็อกหน้าจอ
 
-		public void PushHightNotification(string title,string message)
+		//		//var notificationManager = (NotificationManager)GetSystemService(Android.Content.Context.NotificationService);
+		//		var notificationManager = context.GetSystemService(Context.NotificationService) as NotificationManager;
+		//		notificationManager.CreateNotificationChannel(channel);
+		//	}
+		//}
+
+		public static void PushHightNotification(Context contextParam, string title,string message)
 		{
 			GetNotificationChanelID();
 
-			var intent = new Intent(mContext, typeof(MainActivity));
+			var intent = new Intent(contextParam, typeof(MainActivity));
 			intent.AddFlags(ActivityFlags.SingleTop);
 
-			PendingIntent pendingIntent = PendingIntent.GetActivity(mContext, NOTIFY_ID, intent, PendingIntentFlags.UpdateCurrent);
-
-			var notificationBuilder = new NotificationCompat.Builder(mContext, HIGH_CHANNEL_ID)
-				.SetSmallIcon(Resource.Drawable.notification_bg)
-				.SetContentTitle(title)
-				.SetContentText(message)
-				.SetContentIntent(pendingIntent)
-				.SetAutoCancel(true)
-				.SetStyle(new BigTextStyle().BigText(message))
-				.SetPriority((int)NotificationPriority.High)
-				.SetVibrate(new long[0])
-				.Build();
-
-			notificationManager.Notify(NOTIFY_ID, notificationBuilder);
-		}
-
-		public void PushHightNotificationForeGround()
-		{
-			var intent = new Intent(mContext, typeof(MainActivity));
-			intent.AddFlags(ActivityFlags.SingleTop);
-			var pendingIntent = PendingIntent.GetActivity(mContext,
-														 0,
+			var pendingIntent1 = PendingIntent.GetActivity(contextParam,
+														 Constants.NOTIFY_ID,
 														 intent,
 														 PendingIntentFlags.UpdateCurrent);
 
-			var notificationBuilder = new NotificationCompat.Builder(mContext, HIGH_CHANNEL_ID)
-				.SetSmallIcon(Resource.Drawable.notification_bg)
-				.SetContentTitle("")
-				.SetContentText("")
-				.SetContentIntent(pendingIntent)
-				.SetAutoCancel(true)
-				.SetStyle(new BigTextStyle().BigText(""))
-				.SetPriority((int)NotificationPriority.High)
-				.SetVibrate(new long[0])
-				.Build();
+			var pendingIntent2 = PendingIntent.GetActivity(contextParam,
+														 100,
+														 intent,
+														 PendingIntentFlags.UpdateCurrent);
 
-			StartForeground(11, notificationBuilder);
+			var notificationBuilder = new NotificationCompat.Builder(contextParam, Constants.HIGH_CHANNEL_ID)
+					.SetSmallIcon(Resource.Drawable.notification_bg)
+					.SetContentTitle(title)
+					.SetContentText(message)
+					.SetGroup("Notification")
+					.SetAutoCancel(true)
+					.SetPriority((int)NotificationPriority.High)
+					.SetVibrate(new long[0])
+					.SetContentIntent(pendingIntent1)
+					.SetStyle(new NotificationCompat.BigTextStyle().BigText(message));
+
+			var GroupnotificationBuilder = new NotificationCompat.Builder(contextParam, Constants.HIGH_CHANNEL_ID)
+									.SetSmallIcon(Resource.Drawable.notification_bg)
+									.SetContentTitle(title)
+									.SetContentText(message)
+									.SetGroup("Notification")
+									.SetGroupSummary(true)
+									.SetAutoCancel(true)
+									.SetPriority((int)NotificationPriority.High)
+									.SetVibrate(new long[0])
+									.SetContentIntent(pendingIntent1)
+									.SetStyle(new NotificationCompat.BigTextStyle().BigText(message));
+
+
+			var notificationManager = NotificationManagerCompat.From(contextParam);
+			notificationManager.Notify(100, GroupnotificationBuilder.Build());
+			notificationManager.Notify(Constants.NOTIFY_ID, notificationBuilder.Build());
 		}
 
-		private async void GetNotificationChanelID()
+		//public void PushHightNotificationForeGround()
+		//{
+		//	var intent = new Intent(context, typeof(MainActivity));
+		//	intent.AddFlags(ActivityFlags.SingleTop);
+		//	var pendingIntent = PendingIntent.GetActivity(context,
+		//												 0,
+		//												 intent,
+		//												 PendingIntentFlags.UpdateCurrent);
+
+		//	var notificationBuilder = new NotificationCompat.Builder(context, HIGH_CHANNEL_ID)
+		//		.SetSmallIcon(Resource.Drawable.notification_bg)
+		//		.SetContentTitle("")
+		//		.SetContentText("")
+		//		.SetContentIntent(pendingIntent)
+		//		.SetAutoCancel(true)
+		//		.SetStyle(new NotificationCompat.BigTextStyle().BigText(""))
+		//		.SetPriority((int)NotificationPriority.High)
+		//		.SetVibrate(new long[0])
+		//		.Build();
+
+		//	//StartForeground(11, notificationBuilder);
+		//}
+
+		private static async void GetNotificationChanelID()
 		{
 			var notification__id = await SecureStorage.GetAsync("NOTIFY_ID");
 			try
@@ -99,8 +115,8 @@ namespace GeofencingLab.Droid.Helper
 				if (string.IsNullOrEmpty(notification__id))
 				{
 					//empty = ไม่เคยได้รับเลย set เป็น 1
-					NOTIFY_ID = 1;
-					await SecureStorage.SetAsync("NOTIFY_ID", NOTIFY_ID.ToString());
+					Constants.NOTIFY_ID = 1;
+					await SecureStorage.SetAsync("NOTIFY_ID", Constants.NOTIFY_ID.ToString());
 				}
 				else
 				{
@@ -114,8 +130,8 @@ namespace GeofencingLab.Droid.Helper
 					{
 						id++;
 					}
-					NOTIFY_ID = id;
-					await SecureStorage.SetAsync("NOTIFY_ID", NOTIFY_ID.ToString());
+					Constants.NOTIFY_ID = id;
+					await SecureStorage.SetAsync("NOTIFY_ID", Constants.NOTIFY_ID.ToString());
 				}
 			}
 			catch (Exception e)
@@ -124,9 +140,5 @@ namespace GeofencingLab.Droid.Helper
 			}
 		}
 
-		public override IBinder OnBind(Intent intent)
-		{
-			throw new NotImplementedException();
-		}
 	}
 }
