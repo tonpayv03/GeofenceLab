@@ -18,7 +18,7 @@ namespace GeofencingLab.Droid.Receiver
 	//[IntentFilter(new[] { "GeofencingBroadcastReceiver.PROCESS_UPDATES" })]
 	public class GeofencingBroadcastReceiver : BroadcastReceiver
 	{
-		private string TAG = "GeofencingBroadcastReceiver";
+		private readonly string TAG = "GeofencingBroadcastReceiver";
 		//public static String ACTION_PROCESS_UPDATES = "GeofenceBroadcastReceiver.PROCESS_UPDATES";
 
 		public override void OnReceive(Context context, Intent intent)
@@ -32,7 +32,7 @@ namespace GeofencingLab.Droid.Receiver
 
 				if (geofencingEvent.HasError)
 				{
-					NotificationHelper.PushHightNotification(context, TAG, "Error receiving geofence event");
+					NotificationHelper.PushHighNotification(context, TAG, "Error receiving geofence event");
 
 					return;
 				}
@@ -60,12 +60,12 @@ namespace GeofencingLab.Droid.Receiver
 
 				var areaName = GetGeofenceTransitionDetails(triggeringGeofences);
 				var transitionType = GetTransitionString(geofenceTransition);
-				Toast.MakeText(context, transitionType, ToastLength.Long).Show();
-				NotificationHelper.PushHightNotification(context, transitionType, areaName);
+				//Toast.MakeText(context, transitionType, ToastLength.Long).Show();
+				NotificationHelper.PushHighNotification(context, transitionType, areaName);
 			}
 			catch (Exception ex)
 			{
-				NotificationHelper.PushHightNotification(context, $"{TAG} Error", ex.Message);
+				NotificationHelper.PushHighNotification(context, $"{TAG} Error", ex.Message);
 			}
 		}
 

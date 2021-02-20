@@ -76,11 +76,15 @@
     <Compile Include="Listener\GeofenceListener.cs" />
     <Compile Include="MainActivity.cs" />
     <Compile Include="MainApplication.cs" />
+    <Compile Include="Receiver\AlarmEndFusedLocationReceiver.cs" />
+    <Compile Include="Receiver\AlarmFusedLocationReceiver.cs" />
+    <Compile Include="Receiver\BatteryLowReceiver.cs" />
+    <Compile Include="Receiver\BootReceiver.cs" />
     <Compile Include="Receiver\GeofencingBroadcastReceiver.cs" />
     <Compile Include="Receiver\LocationBroadcastReceiver.cs" />
-    <Compile Include="Receiver\MyReceiverTest.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\FusedLocationService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -112,10 +116,28 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable\markeron.png" />
+    <AndroidResource Include="Resources\drawable\marker_blue.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable\markeron_limeblue.png" />
+    <AndroidResource Include="Resources\drawable\marker_red.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\marker_navy.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\marker_gray.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\marker_orange.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\marker_purple.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\marker_yellow.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\marker_limeblue.png" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <ProjectExtensions>
