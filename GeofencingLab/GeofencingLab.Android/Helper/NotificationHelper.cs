@@ -39,7 +39,7 @@ namespace GeofencingLab.Droid.Helper
 		//	}
 		//}
 
-		public static void PushHightNotification(Context contextParam, string title,string message)
+		public static void PushHighNotification(Context contextParam, string title,string message)
 		{
 			//contextParam = global::Android.App.Application.Context;
 			GetNotificationID();
@@ -57,8 +57,14 @@ namespace GeofencingLab.Droid.Helper
 			//											 intent,
 			//											 PendingIntentFlags.UpdateCurrent);
 
+			Array values = Enum.GetValues(typeof(MarkerIcon));
+			Random random = new Random();
+			MarkerIcon randomBar = (MarkerIcon)values.GetValue(random.Next(values.Length));
+
+			var randomMarker = GetDrawableIcon();
+
 			var notificationBuilder = new NotificationCompat.Builder(contextParam, Treasure.HIGH_CHANNEL_ID)
-					.SetSmallIcon(Resource.Drawable.markeron_limeblue)
+					.SetSmallIcon(randomMarker)
 					.SetContentTitle(title)
 					.SetContentText(message)
 					.SetGroup("Notification")
@@ -69,7 +75,7 @@ namespace GeofencingLab.Droid.Helper
 					.SetStyle(new NotificationCompat.BigTextStyle().BigText(message));
 
 			var GroupnotificationBuilder = new NotificationCompat.Builder(contextParam, Treasure.HIGH_CHANNEL_ID)
-									.SetSmallIcon(Resource.Drawable.markeron_limeblue)
+									.SetSmallIcon(randomMarker)
 									.SetContentTitle(title)
 									.SetContentText(message)
 									.SetGroup("Notification")
@@ -83,6 +89,54 @@ namespace GeofencingLab.Droid.Helper
 
 			var notificationManager = NotificationManagerCompat.From(contextParam);
 			notificationManager.Notify(100, GroupnotificationBuilder.Build());
+			notificationManager.Notify(Treasure.NOTIFY_ID, notificationBuilder.Build());
+		}
+
+		public static void PushNotification(Context contextParam, string title, string message)
+		{
+			//contextParam = global::Android.App.Application.Context;
+			GetNotificationID();
+
+			var intent = new Intent(contextParam, typeof(MainActivity));
+			intent.AddFlags(ActivityFlags.SingleTop);
+
+			var pendingIntent1 = PendingIntent.GetActivity(contextParam,
+														 Treasure.NOTIFY_ID,
+														 intent,
+														 PendingIntentFlags.UpdateCurrent);
+
+			Array values = Enum.GetValues(typeof(MarkerIcon));
+			Random random = new Random();
+			MarkerIcon randomBar = (MarkerIcon)values.GetValue(random.Next(values.Length));
+
+			var randomMarker = GetDrawableIcon();
+
+			var notificationBuilder = new NotificationCompat.Builder(contextParam, Treasure.LOCATION_CHANNEL_ID)
+					.SetSmallIcon(randomMarker)
+					.SetContentTitle(title)
+					.SetContentText(message)
+					.SetGroup("Location Notification")
+					.SetAutoCancel(true)
+					.SetPriority((int)NotificationPriority.Default)
+					.SetVibrate(new long[0])
+					.SetContentIntent(pendingIntent1)
+					.SetStyle(new NotificationCompat.BigTextStyle().BigText(message));
+
+			var GroupnotificationBuilder = new NotificationCompat.Builder(contextParam, Treasure.LOCATION_CHANNEL_ID)
+									.SetSmallIcon(randomMarker)
+									.SetContentTitle(title)
+									.SetContentText(message)
+									.SetGroup("Location Notification")
+									.SetGroupSummary(true)
+									.SetAutoCancel(true)
+									.SetPriority((int)NotificationPriority.Default)
+									.SetVibrate(new long[0])
+									.SetContentIntent(pendingIntent1)
+									.SetStyle(new NotificationCompat.BigTextStyle().BigText(message));
+
+
+			var notificationManager = NotificationManagerCompat.From(contextParam);
+			notificationManager.Notify(200, GroupnotificationBuilder.Build());
 			notificationManager.Notify(Treasure.NOTIFY_ID, notificationBuilder.Build());
 		}
 
@@ -142,5 +196,44 @@ namespace GeofencingLab.Droid.Helper
 			}
 		}
 
+		private static int GetDrawableIcon()
+		{
+			Array values = Enum.GetValues(typeof(MarkerIcon));
+			Random random = new Random();
+			MarkerIcon randomBar = (MarkerIcon)values.GetValue(random.Next(values.Length));
+
+			int drawable;
+			switch (randomBar)
+			{
+				case MarkerIcon.Blue:
+					drawable = Resource.Drawable.marker_blue;
+					break;
+				case MarkerIcon.LimeBlue:
+					drawable = Resource.Drawable.marker_limeblue;
+					break;
+				case MarkerIcon.Navy:
+					drawable = Resource.Drawable.marker_navy;
+					break;
+				case MarkerIcon.Orange:
+					drawable = Resource.Drawable.marker_orange;
+					break;
+				case MarkerIcon.Purple:
+					drawable = Resource.Drawable.marker_purple;
+					break;
+				case MarkerIcon.Red:
+					drawable = Resource.Drawable.marker_red;
+					break;
+				case MarkerIcon.Yellow:
+					drawable = Resource.Drawable.marker_yellow;
+					break;
+				case MarkerIcon.Gray:
+					drawable = Resource.Drawable.marker_gray;
+					break;
+				default:
+					drawable = Resource.Drawable.marker_gray;
+					break;
+			}           
+			return drawable;
+		}
 	}
 }
