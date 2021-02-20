@@ -16,7 +16,7 @@ namespace GeofencingLab
 
 		protected override void OnStart()
 		{
-			DependencyService.Get<IGeofencingManagerService>().InitGeofence();
+			//DependencyService.Get<IGeofencingManagerService>().InitGeofence();
 		}
 
 		protected override void OnSleep()

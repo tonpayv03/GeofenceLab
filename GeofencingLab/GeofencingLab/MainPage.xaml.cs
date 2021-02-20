@@ -13,6 +13,23 @@ namespace GeofencingLab
 		public MainPage()
 		{
 			InitializeComponent();
+
+			MessagingCenter.Unsubscribe<object, string[]>(this, "UpdateLatLng");
+			MessagingCenter.Subscribe<object, string[]>(this, "UpdateLatLng", (sender, value) =>
+			{
+
+				Device.BeginInvokeOnMainThread(() =>
+				{
+					LatTxt.Text = value[0];
+					LngTxt.Text = value[1];
+				});
+			});
+		}
+
+		protected override void OnDisappearing()
+		{
+			base.OnDisappearing();
+			MessagingCenter.Unsubscribe<object, string[]>(this, "UpdateLatLng");
 		}
 	}
 }
