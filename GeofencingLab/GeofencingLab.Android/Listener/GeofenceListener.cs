@@ -28,7 +28,7 @@ namespace GeofencingLab.Droid.Listener
 		{
 			//Log.Info("GeofenceListener_TAG", "OnSuccess: Geofence Added...");
 			Toast.MakeText(MainActivity.Instance, "OnSuccess: Geofence Added...", ToastLength.Long).Show();
-			NotificationHelper.PushHightNotification(Android.App.Application.Context, "OnSuccess", "Geofence Added...");
+			NotificationHelper.PushHighNotification(Android.App.Application.Context, "OnSuccess", "Geofence Added...");
 		}
 
 		public void OnFailure(Java.Lang.Exception e)
