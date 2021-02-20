@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Xamarin.Forms;
 
 namespace GeofencingLab.Droid.Receiver
 {
@@ -18,12 +19,12 @@ namespace GeofencingLab.Droid.Receiver
 	//[IntentFilter(new[] { "LocationBroadcastReceiver.PROCESS_UPDATES" })]
 	public class LocationBroadcastReceiver : BroadcastReceiver
 	{
-		private static String TAG = "LocationBroadcastReceiver";
-		public static String ACTION_PROCESS_UPDATES = "LocationBroadcastReceiver.PROCESS_UPDATES";
+		private readonly string TAG = "LocationBroadcastReceiver";
+		//public static string ACTION_PROCESS_UPDATES = "LocationBroadcastReceiver.PROCESS_UPDATES";
 
 		public override void OnReceive(Context context, Intent intent)
 		{
-			String action = intent.Action;
+			string action = intent.Action;
 			LocationResult result = LocationResult.ExtractResult(intent);
 			if (result != null)
 			{
@@ -31,12 +32,21 @@ namespace GeofencingLab.Droid.Receiver
 				
 				if (locations == null || locations.Count == 0)
 				{
-					NotificationHelper.PushHightNotification(context, TAG + "Error", "location null");
+					NotificationHelper.PushHighNotification(context, TAG + "Error", "location null");
 					return;
 				}
 				Location location = locations.FirstOrDefault();
-				//NotificationHelper.PushHightNotification(context, TAG, $"Lat::{location.Latitude} / Lng::{location.Longitude}");
-				Toast.MakeText(context, $"Lat:{location.Latitude:.######} / Lng:{location.Longitude:.######}", ToastLength.Long).Show();
+				var latStr = $"Lat:{location.Latitude:.######}";
+				var lngStr = $"Lng:{location.Longitude:.######}";
+
+				NotificationHelper.PushNotification(context, TAG, $"Lat::{location.Latitude} / Lng::{location.Longitude}");
+				//Toast.MakeText(context, $"{latStr} / {lngStr}", ToastLength.Long).Show();
+
+				string[] value = new string[]
+				{
+					$"{latStr}",$"{lngStr}"
+				};
+				MessagingCenter.Send<object,string[]>(this, "UpdateLatLng", value);
 			}
 		}
 	}
