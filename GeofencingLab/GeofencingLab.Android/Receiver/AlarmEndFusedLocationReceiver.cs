@@ -21,7 +21,7 @@ namespace GeofencingLab.Droid.Receiver
 		public override void OnReceive(Context context, Intent intent)
 		{
 			var date = DateTime.UtcNow.AddHours(7);
-			NotificationHelper.PushHighNotification(context, TAG, $"{date:dd/MM/yyyy HH:mm:ss}");
+			NotificationHelper.PushHighNotification(context, "Stop Service Location", $"{date:dd/MM/yyyy HH:mm:ss}");
 
 			Intent locationIntent = new Intent(context, typeof(FusedLocationService));
 			context.StopService(locationIntent);

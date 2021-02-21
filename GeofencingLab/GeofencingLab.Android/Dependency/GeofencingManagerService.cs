@@ -42,7 +42,6 @@ namespace GeofencingLab.Droid.Dependency
 		public GeofencingManagerService()
 		{
 			context = global::Android.App.Application.Context;
-			//mContext = MainActivity.Instance;
 		}
 
 		public void InitGeofence()

@@ -29,7 +29,7 @@ namespace GeofencingLab.Droid.Receiver
 			if (result != null)
 			{
 				IList<Location> locations = result.Locations;
-				
+
 				if (locations == null || locations.Count == 0)
 				{
 					NotificationHelper.PushHighNotification(context, TAG + "Error", "location null");
@@ -39,14 +39,16 @@ namespace GeofencingLab.Droid.Receiver
 				var latStr = $"Lat:{location.Latitude:.######}";
 				var lngStr = $"Lng:{location.Longitude:.######}";
 
-				NotificationHelper.PushNotification(context, TAG, $"Lat::{location.Latitude} / Lng::{location.Longitude}");
-				//Toast.MakeText(context, $"{latStr} / {lngStr}", ToastLength.Long).Show();
-
 				string[] value = new string[]
 				{
 					$"{latStr}",$"{lngStr}"
 				};
-				MessagingCenter.Send<object,string[]>(this, "UpdateLatLng", value);
+
+				MessagingCenter.Send<object, string[]>(this, "UpdateLatLng", value);
+
+				NotificationHelper.PushNotification(context, TAG, $"Lat::{location.Latitude} / Lng::{location.Longitude}");
+				//Toast.MakeText(context, $"{latStr} / {lngStr}", ToastLength.Long).Show();
+
 			}
 		}
 	}

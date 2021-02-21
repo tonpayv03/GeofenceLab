@@ -75,7 +75,7 @@ namespace GeofencingLab.Droid.Helper
 					.SetStyle(new NotificationCompat.BigTextStyle().BigText(message));
 
 			var GroupnotificationBuilder = new NotificationCompat.Builder(contextParam, Treasure.HIGH_CHANNEL_ID)
-									.SetSmallIcon(randomMarker)
+									.SetSmallIcon(Resource.Drawable.marker_gray)
 									.SetContentTitle(title)
 									.SetContentText(message)
 									.SetGroup("Notification")
@@ -123,7 +123,7 @@ namespace GeofencingLab.Droid.Helper
 					.SetStyle(new NotificationCompat.BigTextStyle().BigText(message));
 
 			var GroupnotificationBuilder = new NotificationCompat.Builder(contextParam, Treasure.LOCATION_CHANNEL_ID)
-									.SetSmallIcon(randomMarker)
+									.SetSmallIcon(Resource.Drawable.marker_gray)
 									.SetContentTitle(title)
 									.SetContentText(message)
 									.SetGroup("Location Notification")
@@ -200,7 +200,7 @@ namespace GeofencingLab.Droid.Helper
 		{
 			Array values = Enum.GetValues(typeof(MarkerIcon));
 			Random random = new Random();
-			MarkerIcon randomBar = (MarkerIcon)values.GetValue(random.Next(values.Length));
+			MarkerIcon randomBar = (MarkerIcon)values.GetValue(random.Next(values.Length-1));
 
 			int drawable;
 			switch (randomBar)

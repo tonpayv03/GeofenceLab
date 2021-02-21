@@ -16,8 +16,8 @@ using Xamarin.Forms;
 
 namespace GeofencingLab.Droid.Receiver
 {
-	[BroadcastReceiver(Enabled = true, Exported = false)]
-	[IntentFilter(new[] { Android.Content.Intent.ActionBootCompleted })]
+	[BroadcastReceiver(Enabled = true, Exported = false, DirectBootAware = true)]
+	[IntentFilter(new[] { Android.Content.Intent.ActionBootCompleted , Android.Content.Intent.ActionLockedBootCompleted })]
 	public class BootReceiver : BroadcastReceiver
 	{
 		private static readonly string TAG = "BootReceiver";
@@ -35,7 +35,7 @@ namespace GeofencingLab.Droid.Receiver
 
 					NotificationHelper.PushHighNotification(context, TAG, "Initial Service Success");
 
-					CreateAlarmManager(context);
+					//CreateAlarmManager(context);
 				}
 			}
 		}

@@ -18,6 +18,7 @@ namespace GeofencingLab.Droid.Helper
 		//private List<IGeofence> geofenceList = new List<IGeofence>();
 		private Context context;
 		private PendingIntent pendingIntent;
+
 		public GeofenceHelper(Context context) : base(context)
 		{
 			this.context = context;
@@ -41,7 +42,7 @@ namespace GeofencingLab.Droid.Helper
 					.SetRequestId(entry.Key)
 					.SetCircularRegion(entry.Value.Latitude, entry.Value.Longitude, Treasure.GEOFENCE_RADIUS)
 					.SetTransitionTypes(Geofence.GeofenceTransitionEnter | Geofence.GeofenceTransitionDwell | Geofence.GeofenceTransitionExit)
-					.SetLoiteringDelay(5000) // 5 second
+					.SetLoiteringDelay(1000 * 5) // 5 second
 					.SetExpirationDuration(Geofence.NeverExpire)
 					.Build());
 			}

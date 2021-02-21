@@ -66,12 +66,16 @@ namespace GeofencingLab.Droid
 			#endregion
 
 			#region RegisterReceiver
+
 			// ถ้าไม่ได้ใส่ใน new Intent ต้อง register วิธีแบบนี้
 			var batteryReceiver = new BatteryLowReceiver();
 			RegisterReceiver(batteryReceiver, new IntentFilter(Android.Content.Intent.ActionBatteryLow));
 
 			var bootReceiver = new BootReceiver();
-			RegisterReceiver(bootReceiver, new IntentFilter(Android.Content.Intent.ActionBootCompleted));
+			IntentFilter intentFilter = new IntentFilter();
+			intentFilter.AddAction(Android.Content.Intent.ActionBootCompleted);
+			intentFilter.AddAction(Android.Content.Intent.ActionLockedBootCompleted);
+			RegisterReceiver(bootReceiver, intentFilter, ActivityFlags.FromBackground);
 
 			#endregion
 
@@ -99,8 +103,8 @@ namespace GeofencingLab.Droid
 		{
 			base.OnDestroy();
 
-			//Intent locationIntent = new Intent(this, typeof(FusedLocationService));
-			//StopService(locationIntent);
+			Intent locationIntent = new Intent(this, typeof(FusedLocationService));
+			StopService(locationIntent);
 		}
 
 		//public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
@@ -268,8 +272,6 @@ namespace GeofencingLab.Droid
 			return true;
 		}
 
-		#region Old
-
 		public bool CheckPermissionUserLocation()
 		{
 			bool isCheck = false;
@@ -350,9 +352,30 @@ namespace GeofencingLab.Droid
 
 		#endregion
 
-		#endregion
-
 		#region Private
+		private async Task Initialize()
+		{
+			try
+			{
+				if (CheckMultiPermission())
+				{
+					if (Treasure.IsGooglePlayServicesInstalled())
+					{
+						Intent locationIntent = new Intent(this, typeof(FusedLocationService));
+						StartService(locationIntent);
+
+						DependencyService.Get<IGeofencingManagerService>().InitGeofence();
+
+						//CreateAlarmManager();
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				NotificationHelper.PushNotification(this, "Iniialize Error", ex.Message);
+			}
+		}
+
 		private bool AddPermission(List<string> permissionsList, string permission)
 		{
 			if (ContextCompat.CheckSelfPermission(this, permission) != Permission.Granted)
@@ -368,48 +391,32 @@ namespace GeofencingLab.Droid
 			return true;
 		}
 
-		private async Task Initialize()
-		{
-			try
-			{
-				if (CheckMultiPermission())
-				{
-					if (Treasure.IsGooglePlayServicesInstalled())
-					{
-						Intent locationIntent = new Intent(this, typeof(FusedLocationService));
-						StartService(locationIntent);
-
-						DependencyService.Get<IGeofencingManagerService>().InitGeofence();
-
-						CreateAlarmManager();
-					}
-				}
-			}
-			catch (Exception ex)
-			{
-				
-			}
-		}
-
 		private void CreateAlarmManager()
 		{
+			Random random = new Random();
 			var timeZone = 7;
-			var startTime = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day).AddHours(timeZone-1).TimeOfDay; // alarm ก่อนเวลาเข้างาน 1 ชั่วโมง  // 23:00:00 PM UTC+7 = 6 โมงเช้าไทย
-			//var end = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day).AddHours(11).TimeOfDay; // 11:00:00 AM UTC+7 =  6 โมงเย็นไทย
+			//var startTime = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day).AddHours(timeZone + 1); // = 8 โมงเช้า
+			//var endTime = startTime.AddHours(12);
+			TimeSpan ts = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc));
+			var startTime = DateTime.UtcNow.AddHours(timeZone).AddMinutes(1);
+			var endTime = DateTime.UtcNow.AddMinutes(3);
 
 			var elapsedTime = SystemClock.ElapsedRealtime();
 
-			AlarmManager alarmManager = this.GetSystemService(Context.AlarmService) as AlarmManager;
+			AlarmManager alarmManager1 = this.GetSystemService(Context.AlarmService) as AlarmManager;
+			AlarmManager alarmManager2 = this.GetSystemService(Context.AlarmService) as AlarmManager;
 
-			Preferences.Set(Treasure.ALARM_KEY, "StartService");
+			//Preferences.Set(Treasure.ALARM_KEY, "StartService");
 			Intent alarmStartIntent = new Intent(this, typeof(AlarmFusedLocationReceiver));
-			var id = (int)SystemClock.ElapsedRealtime() + 1000;
-			PendingIntent pendingAlarmStartIntent = PendingIntent.GetBroadcast(this, id, alarmStartIntent, PendingIntentFlags.UpdateCurrent);
-			alarmManager.SetInexactRepeating(AlarmType.RtcWakeup, (long)startTime.TotalMilliseconds, AlarmManager.IntervalHalfDay, pendingAlarmStartIntent);
+			PendingIntent pendingAlarmStartIntent = PendingIntent.GetBroadcast(this, random.Next(1, 20), alarmStartIntent, 0);
 
-			// 43200000 = 12 Hours
-			//alarmManager.SetExactAndAllowWhileIdle(AlarmType.RtcWakeup, (long)start.TotalMilliseconds, pendingAlarmStartIntent);
-			//alarmManager.SetExactAndAllowWhileIdle(AlarmType.RtcWakeup, (long)end.TotalMilliseconds, pendingAlarmEndIntent);
+			//alarmManager.SetInexactRepeating(AlarmType.RtcWakeup, (long)startTime.TotalMilliseconds, AlarmManager.IntervalHalfDay, pendingAlarmStartIntent);
+
+			Intent alarmEndIntent = new Intent(this, typeof(AlarmEndFusedLocationReceiver));
+			PendingIntent pendingAlarmEndIntent = PendingIntent.GetBroadcast(this, random.Next(41, 60), alarmEndIntent, 0);
+
+			alarmManager1.SetExactAndAllowWhileIdle(AlarmType.RtcWakeup, (long)startTime.TimeOfDay.TotalMilliseconds, pendingAlarmStartIntent);
+			alarmManager2.SetExactAndAllowWhileIdle(AlarmType.RtcWakeup, (long)endTime.TimeOfDay.TotalMilliseconds, pendingAlarmEndIntent);
 		}
 
 		private void InitNotificationChannel()
@@ -422,20 +429,20 @@ namespace GeofencingLab.Droid
 				};
 
 				highChannel.SetBypassDnd(true); // สามารถแสดงได้อยู่ถึงแม้ว่าจะอยู่ในโหมด Do Not Disturb
-											//channel.SetAllowBubbles(true); // แสดง Bubbles 
 				highChannel.LockscreenVisibility = NotificationVisibility.Public; // แสดงข้อมูลทั้งหมดตามปกติ ตอนล็อกหน้าจอ
 
-				var coordinatesChannel = new NotificationChannel(Treasure.LOCATION_CHANNEL_ID, "Location coordinates Notifications", NotificationImportance.Default)
+				var coordinatesChannel = new NotificationChannel(Treasure.LOCATION_CHANNEL_ID, "Location Coordinates Notifications", NotificationImportance.Default)
 				{
-					Description = "Chanel For Location coordinates",
+					Description = "Chanel For Location Coordinates",
 				};
 
-				coordinatesChannel.SetBypassDnd(true); 
+				coordinatesChannel.SetBypassDnd(true);
 				coordinatesChannel.LockscreenVisibility = NotificationVisibility.Public;
 
 
 				var notificationManager = (NotificationManager)GetSystemService(Android.Content.Context.NotificationService);
 				notificationManager.CreateNotificationChannel(highChannel);
+				notificationManager.CreateNotificationChannel(coordinatesChannel);
 			}
 		}
 
