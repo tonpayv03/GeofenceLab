@@ -41,7 +41,8 @@ namespace GeofencingLab.Droid.Helper
 				geofenceList.Add(new GeofenceBuilder()
 					.SetRequestId(entry.Key)
 					.SetCircularRegion(entry.Value.Latitude, entry.Value.Longitude, Treasure.GEOFENCE_RADIUS)
-					.SetTransitionTypes(Geofence.GeofenceTransitionEnter | Geofence.GeofenceTransitionDwell | Geofence.GeofenceTransitionExit)
+					.SetTransitionTypes(Geofence.GeofenceTransitionEnter | Geofence.GeofenceTransitionExit)
+					//.SetTransitionTypes(Geofence.GeofenceTransitionEnter | Geofence.GeofenceTransitionDwell | Geofence.GeofenceTransitionExit)
 					.SetLoiteringDelay(1000 * 5) // 5 second
 					.SetExpirationDuration(Geofence.NeverExpire)
 					.Build());
